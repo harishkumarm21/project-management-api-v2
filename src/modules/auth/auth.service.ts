@@ -1,5 +1,5 @@
 import { ConflictError } from "../../errors/ConflictError.js";
-import { AuthRepository, authRepository } from "./auth.repository.js";
+import { AuthRepository } from "./auth.repository.js";
 import bcrypt from "bcrypt";
 import { RegisterInput } from "./auth.validation.js";
 
