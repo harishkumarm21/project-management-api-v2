@@ -3,3 +3,9 @@ export interface createUserData{
   passwardHash: string;
   displayName: string
 }
+
+// export interface registerUserInput {
+//   email: string
+//   password: string
+//   displayName: string
+// }
