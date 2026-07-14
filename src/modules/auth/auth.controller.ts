@@ -19,6 +19,16 @@ export class AuthController {
       next(error)
     }
   }
+
+  async login(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = await authService.login(req.body);
+
+      sendSuccess({ res, statusCode: 200, message: "Login Successfully", data: user })
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 export const authController = new AuthController();

@@ -1,7 +1,8 @@
 import { ConflictError } from "../../errors/ConflictError.js";
 import { AuthRepository } from "./auth.repository.js";
 import bcrypt from "bcrypt";
-import { RegisterInput } from "./auth.validation.js";
+import { LoginInput, RegisterInput } from "./auth.validation.js";
+import { UnAuthorizedError } from "../../errors/UnauthorizedError.js";
 
 export class AuthService {
   constructor(private readonly authRepository: AuthRepository) { }
@@ -24,6 +25,23 @@ export class AuthService {
       email: user.email,
       displayName: user.displayName,
       createdAt: user.createdAt
+    }
+  }
+
+  async login(input: LoginInput) {
+
+    const user = await this.authRepository.findUserByEmail(input.email);
+
+    if (!user) throw new UnAuthorizedError("Invalid email or password");
+
+    const isPasswordValid = await bcrypt.compare(input.password, user.passwordHash);
+
+    if (!isPasswordValid) throw new UnAuthorizedError("Invalid email or password");
+
+    return {
+      id: user.id,
+      email: user.email,
+      displayName: user.displayName
     }
   }
 }
