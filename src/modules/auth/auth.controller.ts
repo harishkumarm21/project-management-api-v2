@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express"
+import { Request, Response } from "express"
 import { authService } from "./auth.service.js";
 import { sendSuccess } from "../../utils/api-response.js";
 
