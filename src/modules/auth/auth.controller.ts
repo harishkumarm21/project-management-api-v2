@@ -3,7 +3,7 @@ import { authService } from "./auth.service.js";
 import { sendSuccess } from "../../utils/api-response.js";
 
 export class AuthController {
-  async register(req: Request, res: Response, next: NextFunction) {
+  async register(req: Request, res: Response) {
     const user = await authService.register(req.body)
 
     return sendSuccess({
@@ -14,7 +14,7 @@ export class AuthController {
     });
   }
 
-  async login(req: Request, res: Response, next: NextFunction) {
+  async login(req: Request, res: Response) {
     const user = await authService.login(req.body);
 
     sendSuccess({ res, statusCode: 200, message: "Login Successfully", data: user })
