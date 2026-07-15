@@ -15,9 +15,9 @@ export class AuthController {
   }
 
   async login(req: Request, res: Response) {
-    const user = await authService.login(req.body);
+    const result = await authService.login(req.body);
 
-    sendSuccess({ res, statusCode: 200, message: "Login Successfully", data: user })
+    sendSuccess({ res, statusCode: 200, message: "Login Successfully", data: result })
   }
 }
 

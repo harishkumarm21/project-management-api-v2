@@ -3,9 +3,14 @@ import { AuthRepository } from "./auth.repository.js";
 import bcrypt from "bcrypt";
 import { LoginInput, RegisterInput } from "./auth.validation.js";
 import { UnAuthorizedError } from "../../errors/UnauthorizedError.js";
+import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.js";
+import { hashRefreshToken } from "../../utils/password.js";
+import { SessionRepository } from "./session.repository.js";
 
 export class AuthService {
-  constructor(private readonly authRepository: AuthRepository) { }
+  constructor(private readonly authRepository: AuthRepository, private readonly sessionRepository: SessionRepository) { }
+
+
   async register(input: RegisterInput) {
 
     const existingUser = await this.authRepository.findUserByEmail(input.email);
@@ -19,6 +24,8 @@ export class AuthService {
     const user = await this.authRepository.createUser({
       email: input.email, passwordHash: passwardHash, displayName: input.displayName
     })
+
+
 
     return {
       id: user.id,
@@ -38,14 +45,31 @@ export class AuthService {
 
     if (!isPasswordValid) throw new UnAuthorizedError("Invalid email or password");
 
+    const accessToken = generateAccessToken(user.id)
+    const refreshToken = generateRefreshToken(user.id)
+
+    const refreshTokenHash = hashRefreshToken(refreshToken);
+
+    await this.sessionRepository.create({
+      user: {
+        connect: {
+          id: user.id
+        }
+      },
+      refreshTokenHash, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    })
+
     return {
-      id: user.id,
-      email: user.email,
-      displayName: user.displayName
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName
+      },
+      accessToken, refreshToken
     }
   }
 }
 
 export const authService = new AuthService(
-  new AuthRepository()
+  new AuthRepository(), new SessionRepository()
 );
