@@ -19,6 +19,12 @@ export class AuthController {
 
     sendSuccess({ res, statusCode: 200, message: "Login Successfully", data: result })
   }
+
+  async refresh(req: Request, res: Response) {
+    const result = await authService.refresh(req.body);
+
+    return sendSuccess({ res, statusCode: 200, message: "Token refreshed", data: result })
+  }
 }
 
 export const authController = new AuthController();

@@ -1,11 +1,13 @@
 import jwt, { type SignOptions } from "jsonwebtoken";
 import { env } from "../config/env.js";
+import { throwDeprecation } from "node:process";
+import { UnAuthorizedError } from "../errors/UnauthorizedError.js";
 
-export interface JwtwPayLoad {
+export interface JwtPayLoad {
   sub: string
 }
 
-function signToken(payload: JwtwPayLoad, secret: string, expiresIn: SignOptions["expiresIn"]): string {
+function signToken(payload: JwtPayLoad, secret: string, expiresIn: SignOptions["expiresIn"]): string {
   return jwt.sign(payload, secret, {
     expiresIn
   })
@@ -22,11 +24,21 @@ export function generateRefreshToken(userId: string): string {
 }
 
 // Verify access token
-export function verifyAccessToken(token: string): JwtwPayLoad {
-  return jwt.verify(token, env.JWT_ACCESS_SECRET) as JwtwPayLoad;
+export function verifyAccessToken(token: string): JwtPayLoad {
+  try {
+    return jwt.verify(token, env.JWT_ACCESS_SECRET) as JwtPayLoad;
+  } catch (error) {
+    console.log("Error in verifyAccessToken", error)
+    throw new UnAuthorizedError("Invalid access token")
+  }
 }
 
 // Verify refresh token
-export function verifyRefreshToken(token: string): JwtwPayLoad {
-  return jwt.verify(token, env.JWT_REFRESH_SECRET) as JwtwPayLoad;
+export function verifyRefreshToken(token: string): JwtPayLoad {
+  try {
+    return jwt.verify(token, env.JWT_REFRESH_SECRET) as JwtPayLoad;
+  } catch (error) {
+    console.log("Error in verifyRefreshToken", error)
+    throw new UnAuthorizedError("Invalid refresh token")
+  }
 }

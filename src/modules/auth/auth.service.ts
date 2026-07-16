@@ -1,9 +1,9 @@
 import { ConflictError } from "../../errors/ConflictError.js";
 import { AuthRepository } from "./auth.repository.js";
 import bcrypt from "bcrypt";
-import { LoginInput, RegisterInput } from "./auth.validation.js";
+import { LoginInput, RefreshInput, RegisterInput } from "./auth.validation.js";
 import { UnAuthorizedError } from "../../errors/UnauthorizedError.js";
-import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.js";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/jwt.js";
 import { hashRefreshToken } from "../../utils/password.js";
 import { SessionRepository } from "./session.repository.js";
 
@@ -67,6 +67,23 @@ export class AuthService {
       },
       accessToken, refreshToken
     }
+  }
+
+  async refresh(input: RefreshInput) {
+
+    const payload = verifyRefreshToken(input.refreshToken)
+
+    const refreshTokenHash = hashRefreshToken(input.refreshToken)
+
+    const session = this.sessionRepository.findByRefreshTokenHash(refreshTokenHash);
+
+    if (!session) {
+      throw new UnAuthorizedError("Invalid refresh token")
+    }
+
+    const accessToken = generateAccessToken(payload.sub)
+
+    return { accessToken }
   }
 }
 
