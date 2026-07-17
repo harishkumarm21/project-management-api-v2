@@ -5,17 +5,36 @@ import { verifyAccessToken } from "../utils/jwt.js";
 
 const authRepository = new AuthRepository();
 
+// Client
+//    │
+// Authorization: Bearer eyJ...
+//    │
+//    ▼
+// Auth Middleware
+//    │
+// Verify JWT
+//    │
+// Load User
+//    │
+// Attach User to Request
+//    │
+// next()
+//    │
+// Controller
+
 export async function Authenticate(req: Request, _res: Response, next: NextFunction) {
 
   const authorization = req.headers.authorization;
 
-  if(!authorization){
+  if (!authorization) {
     throw new UnAuthorizedError("Authorization header missing")
   }
 
   const [schema, token] = authorization.split(" ");
 
-  if(schema!== "bearer" || !token){
+  console.log("==========", schema)
+
+  if (schema !== "Bearer" || !token) {
     throw new UnAuthorizedError("Invalid authorization header")
   }
 
@@ -23,16 +42,16 @@ export async function Authenticate(req: Request, _res: Response, next: NextFunct
 
   const user = await authRepository.findUserById(payload.sub)
 
-  if(!user){
+  if (!user) {
     throw new UnAuthorizedError("User not found")
   }
 
-  if(!user.isActive){
+  if (!user.isActive) {
     throw new UnAuthorizedError("User account is disabled")
   }
 
   req.user = user;
 
   next();
-  
+
 }

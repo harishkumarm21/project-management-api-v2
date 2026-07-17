@@ -9,6 +9,15 @@ export class AuthRepository {
       where: {
         id,
       },
+
+      select: {
+        id: true,
+        displayName: true,
+        email: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true
+      }
     });
   }
 

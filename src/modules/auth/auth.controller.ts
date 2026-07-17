@@ -25,6 +25,13 @@ export class AuthController {
 
     return sendSuccess({ res, statusCode: 200, message: "Token refreshed", data: result })
   }
+
+  async logout(req: Request, res: Response) {
+    const result = await authService.logout(req.body);
+
+    return sendSuccess({ res, statusCode: 200, message: "Logged out successfully", data: {} })
+
+  }
 }
 
 export const authController = new AuthController();

@@ -17,12 +17,16 @@ export const loginSchema = z.object({
 
   password: z.string().trim().min(8, "Password must contain at least 8 characters").max(72),
 })
-
 export type LoginInput = z.infer<typeof loginSchema>
 
 //Refresh
 export const refreshSchema = z.object({
   refreshToken: z.string().min(1)
 })
-
 export type RefreshInput = z.infer<typeof refreshSchema>
+
+//Logout
+export const logoutSchema = z.object({
+  refreshToken: z.string().min(1)
+});
+export type LogoutInput = z.infer<typeof logoutSchema>
